@@ -1,27 +1,39 @@
 module ZohoRecruiter
   class Client
     include HTTParty
+    debug_output $stdout
 
     base_uri 'https://recruit.zoho.com/recruit/private'
 
     def initialize(token)
-      @auth_token = token
+      @authtoken = token
     end
 
     def get_records(modules, options = {})
       define_default_options(options)
 
-      get_response("/#{options[:format]}/#{modules}/getRecords/", {
-        query: permitted_queries(options)
+      get_response("/#{options[:format]}/#{modules}/getRecords", {
+        query: permitted_generic_queries(options)
       })
     end
 
     def get_record_by_id(modules, id, options = {})
       define_default_options(options)
-      options[:id] = id
 
-      get_response("/#{options[:format]}/#{modules}/getRecordById/", {
-        query: permitted_queries(options)
+      queries = permitted_generic_queries(options).merge(id: id)
+
+      get_response("/#{options[:format]}/#{modules}/getRecordById", {
+        query: queries
+      })
+    end
+
+    def get_modules(options = {})
+      define_default_options(options)
+
+      modules = 'Info/getModules'
+
+      get_response("/#{options[:format]}/#{modules}", {
+        query: permitted_generic_queries(options)
       })
     end
 
@@ -38,8 +50,8 @@ module ZohoRecruiter
       self.class.get(url, options)
     end
 
-    def permitted_queries(options)
-      options.select { |key, value| [:authtoken, :id, :version].include? key }
+    def permitted_generic_queries(options)
+      options.select { |key, value| [:authtoken, :scope, :version].include? key }
     end
   end
 end
