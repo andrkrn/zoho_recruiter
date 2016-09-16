@@ -9,6 +9,9 @@ module ZohoRecruiter
       @authtoken = token
     end
 
+    # getRecords
+    # To retrieve all users data specified in the API request
+    # https://www.zoho.com/recruit/api-new/api-methods/getRecordsMethod.html
     def get_records(modules, options = {})
       define_default_options(options)
 
@@ -17,6 +20,9 @@ module ZohoRecruiter
       })
     end
 
+    # getRecordById
+    # To retrieve individual records by record ID
+    # https://www.zoho.com/recruit/api-new/api-methods/getRecordByIdMethod.html
     def get_record_by_id(modules, id, options = {})
       define_default_options(options)
 
@@ -27,6 +33,21 @@ module ZohoRecruiter
       })
     end
 
+    def add_records
+    end
+
+    def update_records
+    end
+
+    # getNoteTypes
+    # To retrieve all note types in the user account which will be useful while adding Notes through API
+    # https://www.zoho.com/recruit/api-new/api-methods/getNoteTypesMethod.html
+    def get_note_types()
+
+    end
+
+    # getModules
+    # To retrieve all modules from Zoho Recruit account
     def get_modules(options = {})
       define_default_options(options)
 
