@@ -43,7 +43,7 @@ module ZohoRecruiter
           scope: options[:scope],
           version: options[:version],
           authtoken: options[:authtoken],
-          xmlData: build_xml(data)
+          xmlData: build_xml(modules, data)
         }
       })
     end
@@ -59,7 +59,7 @@ module ZohoRecruiter
           version: options[:version],
           authtoken: options[:authtoken],
           id: id,
-          xmlData: build_xml(data)
+          xmlData: build_xml(modules, data)
         }
       })
     end
