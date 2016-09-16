@@ -22,8 +22,57 @@ module ZohoRecruiter
 
       queries = permitted_generic_queries(options).merge(id: id)
 
-      get_response("/#{options[:format]}/#{modules}/getRecordById", {
+      get_response("/json/#{modules}/getRecordById", {
         query: queries
+      })
+    end
+
+    def add_records(modules, data, options = {})
+      options[:scope]     ||= 'recruitapi'
+      options[:version]   ||= '2'
+      options[:authtoken] ||= @authtoken
+
+      post_request("/xml/#{modules}/addRecords", {
+        query: {
+          scope: options[:scope],
+          version: options[:version],
+          authtoken: options[:authtoken],
+          xmlData: build_xml(data)
+        }
+      })
+    end
+
+    def update_records(modules, id, data, options = {})
+      options[:scope]     ||= 'recruitapi'
+      options[:version]   ||= '2'
+      options[:authtoken] ||= @authtoken
+
+      post_request("/xml/#{modules}/updateRecords", {
+        query: {
+          scope: options[:scope],
+          version: options[:version],
+          authtoken: options[:authtoken],
+          id: id,
+          xmlData: build_xml(data)
+        }
+      })
+    end
+
+    def associate_job_opening(job_ids, candidate_ids, options = {})
+      options[:scope]     ||= 'recruitapi'
+      options[:version]   ||= '2'
+      options[:authtoken] ||= @authtoken
+
+      post_request("/xml/Candidates/associateJobOpening", {
+        query: {
+          scope: options[:scope],
+          version: options[:version],
+          authtoken: options[:authtoken],
+          jobIds: job_ids,
+          candidateIds: candidate_ids,
+          status: options[:status],
+          comments: options[:comments]
+        }   
       })
     end
 
@@ -40,7 +89,6 @@ module ZohoRecruiter
     private
 
     def define_default_options(options)
-      options[:format]    ||= 'json'
       options[:scope]     ||= 'recruitapi'
       options[:version]   ||= '2'
       options[:authtoken] ||= @authtoken
@@ -50,8 +98,39 @@ module ZohoRecruiter
       self.class.get(url, options)
     end
 
+    def post_request(url, options)
+      self.class.post(url, options)
+    end
+
     def permitted_generic_queries(options)
       options.select { |key, value| [:authtoken, :scope, :version].include? key }
+    end
+
+    # Build xml data for Zoho Recruiter
+    #
+    # data = [{
+    #   'Posting Title' => 'Sample Job Something',
+    #   'Client Name' => '41studio'
+    # }, {
+    #   'Posting Title' => 'Sample Job Something',
+    #   'Client Name' => '41studio'
+    # }]
+    #
+    # build_xml('JobOpenings', data)
+    #
+    def build_xml(modules, data = {})
+      builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
+        xml.send(modules) do
+          data.each.with_index(1) do |fields, i|
+            xml.row(no: i) do
+              fields.each do |key, value|
+              xml.FL(value, val: key)
+              end
+            end
+          end
+        end
+      end
+      builder.to_xml
     end
   end
 end
