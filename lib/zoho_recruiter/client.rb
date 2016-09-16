@@ -82,6 +82,24 @@ module ZohoRecruiter
       })
     end
 
+    def change_status(candidate_ids, status, options = {})
+      options[:scope]     ||= 'recruitapi'
+      options[:version]   ||= '2'
+      options[:authtoken] ||= @authtoken
+
+      post_request("/xml/Candidates/changeStatus", {
+        query: {
+          scope: options[:scope],
+          version: options[:version],
+          authtoken: options[:authtoken],
+          candidateIds: candidate_ids,
+          candidateStatus: status,
+          jobId: options[:jobId],
+          comments: options[:comments]
+        }
+      })
+    end
+
     def get_modules(options = {})
       define_default_options(options)
 
